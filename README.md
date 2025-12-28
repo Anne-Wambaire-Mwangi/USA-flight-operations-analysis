@@ -232,6 +232,7 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 
 📥 **Power BI File**
 - [Download PBIX](https://drive.google.com/file/d/1bXrlKnyMT-KtkH0JB6_kqHgJHNrdK3z3/view?usp=drive_link)
+- [Download Pdf](https://drive.google.com/file/d/1bXrlKnyMT-KtkH0JB6_kqHgJHNrdK3z3/view?usp=drive_link)
 
 **Instructions:**
 - Open the `.pbix` file to explore interactive dashboards
