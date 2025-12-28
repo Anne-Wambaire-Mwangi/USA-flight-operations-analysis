@@ -1,24 +1,4 @@
-# ✈️ US Flights Operations Delay Analysis
 
-## 1. About
-
-This project delivers an end-to-end analytical review of US domestic flight operations, with a focus on **delays, cancellations, reliability, economic cost, and environmental impact**. Using publicly available US flight data, the analysis transforms millions of flight records into decision-ready insights for airlines, airports, regulators, and operations teams.
-
-The goal is not just reporting but **diagnosing systemic operational inefficiencies** and highlighting where performance, reliability, cost control, and sustainability can be improved.
-
----
-
-## 2. Tags & Badges
-
-**Tags**  
-`Power BI` · `Data Analytics` · `Aviation Analytics` · `Operations Analytics` · `Business Intelligence` · `DAX` · `Data Modeling`
-
-**Badges**
-- 📊 Power BI Dashboard
-- 📈 Analytics Project
-- 🌱 Sustainability Analytics
-
----
 
 ## 3. Introduction (Scope)
 
