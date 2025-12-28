@@ -230,7 +230,7 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 
 https://github.com/Anne-Wambaire-Mwangi/USA-flight-operations-analysis/assets/179276223/your-video-asset-id.mp4
 
-*Alternative: [Click here to watch the tutorial](https://github.com/Anne-Wambaire-Mwangi/USA-flight-operations-analysis/blob/main/video/How%20To%20Navigate.mp4)*
+*Alternative: [Click here to watch the tutorial]([https://github.com/Anne-Wambaire-Mwangi/USA-flight-operations-analysis/blob/main/video/How%20To%20Navigate.mp4](https://github.com/Anne-Wambaire-Mwangi/USA-flight-operations-analysis/blob/main/video/How%20To%20Navigate.mp4))*
 
 📥 **Power BI File**
 - [Download PBIX](https://drive.google.com/file/d/1bXrlKnyMT-KtkH0JB6_kqHgJHNrdK3z3/view?usp=drive_link)
