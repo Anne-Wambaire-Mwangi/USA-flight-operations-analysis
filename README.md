@@ -27,53 +27,53 @@ The analysis spans **10 years** and over **5.6 million flights**, enabling both 
 
 The Power BI report is organized into focused analytical dashboards:
 
-### 📊 Executive Overview
+###  Executive Overview
 ![Executive Overview](screenshots/dashboard-executive-overview.png)
 
 - Overall system health (on-time performance, cancellations, delays)
 - High-level KPIs for leadership and stakeholders
 
-### 🔍 Delay Patterns & Root Causes
+###  Delay Patterns & Root Causes
 ![Delay Analysis](screenshots/dashboard-delay-analysis.png)
 
 - Delay contribution by cause
 - Time-of-day, day-of-week, and yearly delay trends
 - Identification of systemic operational bottlenecks
 
-### ✈️ Airport Performance
+###  Airport Performance
 ![Airport Performance](screenshots/dashboard-airport-performance.png)
 
 - Worst-performing airports by average arrival delay
 - Airports with the highest cancellation risk
 - Ranking-based benchmarking across the national network
 
-### 🏢 Airline Reliability
+###  Airline Reliability
 ![Airline Reliability](screenshots/dashboard-airline-reliability.png)
 
 - Best vs worst-performing carriers
 - Trade-off between punctuality and cancellation behavior
 
-### 🛫 Route Performance
+###  Route Performance
 ![Route Performance](screenshots/dashboard-route-performance.png)
 
 - High-risk and consistently delayed routes
 - Routes with 100% delay rates
 - Reliability and cancellation behavior at route level
 
-### 💰 Economic Impact
+###  Economic Impact
 ![Cost Impact](screenshots/dashboard-cost-impact.png)
 
 - Estimated cost of delays by year and time of day
 - Identification of peak cost periods
 
-### 🌍 Environmental Impact
+###  Environmental Impact
 ![Environmental Impact](screenshots/dashboard-environmental-impact.png)
 
 - Estimated excess fuel burn from delays
 - CO₂ emissions attributable to operational inefficiencies
 - Airports contributing most to emissions
 
-### 📉 Flight Cancellation Analysis
+###  Flight Cancellation Analysis
 ![Flight Cancellation Analysis](screenshots/dashboard-Flight-cancellation-analysis.png)
 
 - Cancellation trends and patterns
@@ -228,6 +228,10 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 
 📹 **Video tutorial included**
 
+📥 **Power BI File**
+- [Download PBIX](https://drive.google.com/file/d/1bXrlKnyMT-KtkH0JB6_kqHgJHNrdK3z3/view?usp=drive_link)
+
+**Instructions:**
 - Open the `.pbix` file to explore interactive dashboards
 - Review the exported PDF for a static executive summary
 
