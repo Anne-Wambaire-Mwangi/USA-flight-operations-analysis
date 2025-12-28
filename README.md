@@ -1,4 +1,4 @@
-#  US Flights Operations Delay Analysis
+# ✈️ US Flights Operations Delay Analysis
 
 ## 1. About
 
@@ -8,21 +8,9 @@ The goal is not just reporting but **diagnosing systemic operational inefficienc
 
 ---
 
-## 2. Tags & Badges
+## 2. Introduction (Scope)
 
-**Tags**  
-`Power BI` · `Data Analytics` · `Aviation Analytics` · `Operations Analytics` · `Business Intelligence` · `DAX` · `Data Modeling`
-
-**Badges**
--  Power BI Dashboard
--  Analytics Project
--  Sustainability Analytics
-
----
-
-## 3. Introduction (Scope)
-
-Modern aviation systems are highly interconnected, a delay at one airport or route can cascade across an entire network. This project explores **how, when, where, and why** these disruptions occur.
+Modern aviation systems are highly interconnected—a delay at one airport or route can cascade across an entire network. This project explores **how, when, where, and why** these disruptions occur.
 
 **Key themes explored:**
 - Network-wide operational performance
@@ -35,45 +23,66 @@ The analysis spans **10 years** and over **5.6 million flights**, enabling both 
 
 ---
 
-## 4. Dashboard Summary
+## 3. Dashboard Summary
 
 The Power BI report is organized into focused analytical dashboards:
 
-###  Executive Overview
+### 📊 Executive Overview
+![Executive Overview](screenshots/dashboard-executive-overview.png)
+
 - Overall system health (on-time performance, cancellations, delays)
 - High-level KPIs for leadership and stakeholders
 
-###  Delay Patterns & Root Causes
+### 🔍 Delay Patterns & Root Causes
+![Delay Analysis](screenshots/dashboard-delay-analysis.png)
+
 - Delay contribution by cause
 - Time-of-day, day-of-week, and yearly delay trends
 - Identification of systemic operational bottlenecks
 
-###  Airport Performance
+### ✈️ Airport Performance
+![Airport Performance](screenshots/dashboard-airport-performance.png)
+
 - Worst-performing airports by average arrival delay
 - Airports with the highest cancellation risk
 - Ranking-based benchmarking across the national network
 
-###  Airline Reliability
+### 🏢 Airline Reliability
+![Airline Reliability](screenshots/dashboard-airline-reliability.png)
+
 - Best vs worst-performing carriers
 - Trade-off between punctuality and cancellation behavior
 
-###  Route Performance
+### 🛫 Route Performance
+![Route Performance](screenshots/dashboard-route-performance.png)
+
 - High-risk and consistently delayed routes
 - Routes with 100% delay rates
 - Reliability and cancellation behavior at route level
 
-###  Economic Impact
+### 💰 Economic Impact
+![Cost Impact](screenshots/dashboard-cost-impact.png)
+
 - Estimated cost of delays by year and time of day
 - Identification of peak cost periods
 
-###  Environmental Impact
+### 🌍 Environmental Impact
+![Environmental Impact](screenshots/dashboard-environmental-impact.png)
+
 - Estimated excess fuel burn from delays
 - CO₂ emissions attributable to operational inefficiencies
 - Airports contributing most to emissions
 
+### 📉 Flight Cancellation Analysis
+![Flight Cancellation Analysis](screenshots/dashboard-flight-cancellation-analysis.png)
+
+- Cancellation trends and patterns
+- Airports and airlines with highest cancellation rates
+- Root causes of flight cancellations
+
 ---
 
-## 5. Analytical Process
+## 4. Analytical Process
 
 1. **Data Understanding & Cleaning**
    - Reviewed raw flight-level data
@@ -98,7 +107,7 @@ The Power BI report is organized into focused analytical dashboards:
 
 ---
 
-## 6. Key Insights
+## 5. Key Insights
 
 ### Executive Performance
 **Overall US aviation system performance:**
@@ -183,7 +192,7 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 
 ---
 
-## 7. Purpose & Target Audience
+## 6. Purpose & Target Audience
 
 **Purpose:**
 - Support operational decision-making
@@ -199,7 +208,7 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 
 ---
 
-## 8. What I Learned
+## 7. What I Learned
 
 - Designing scalable data models for large datasets
 - Translating operational metrics into business KPIs
@@ -209,13 +218,13 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 
 ---
 
-## 9. Next Phase
+## 8. Next Phase
 
 - Predictive analysis implementation
 
 ---
 
-## 10. How to Use This Repository
+## 9. How to Use This Repository
 
 📹 **Video tutorial included**
 
@@ -224,7 +233,7 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 
 ---
 
-## 11. Notes
+## 10. Notes
 
 **Data Views:**
 - **Operational view**: Includes all positive delay minutes (ArrDelay > 0) for root cause and customer experience analysis
@@ -236,4 +245,4 @@ JetBlue, Allegiant, Frontier, SkyWest, and PSA Airlines
 ---
 
 **Author:** Anne Wambaire Mwangi  
-**Focus:** Business Intelligence · Operations Analytics · Aviation Systems Business Intelligence · Operations Analytics · Aviation Systems
+**Focus:** Business Intelligence · Operations Analytics · Aviation Systems
