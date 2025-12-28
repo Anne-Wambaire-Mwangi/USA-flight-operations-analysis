@@ -74,7 +74,7 @@ The Power BI report is organized into focused analytical dashboards:
 - Airports contributing most to emissions
 
 ### 📉 Flight Cancellation Analysis
-![Flight Cancellation Analysis](screenshots/dashboard-flight-cancellation-analysis.png)
+![Flight Cancellation Analysis](screenshots/dashboard-Flight-cancellation-analysis.png)
 
 - Cancellation trends and patterns
 - Airports and airlines with highest cancellation rates
