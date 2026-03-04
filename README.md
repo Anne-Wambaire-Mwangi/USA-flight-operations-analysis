@@ -10,7 +10,7 @@ The goal is not just reporting but **diagnosing systemic operational inefficienc
 
 ## 2. Introduction (Scope)
 
-Modern aviation systems are highly interconnected—a delay at one airport or route can cascade across an entire network. This project explores **how, when, where, and why** these disruptions occur.
+Modern aviation systems are highly interconnected, a delay at one airport or route can cascade across an entire network. This project explores **how, when, where, and why** these disruptions occur.
 
 **Key themes explored:**
 - Network-wide operational performance
