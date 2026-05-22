@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>US Flights Operations Delay Analysis | Anne Wambaire Mwangi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root{
+      --vb-cream:#faf8f4;
+      --vb-linen:#f1ece4;
+      --vb-sage:#7a8b6f;
+      --vb-sage-light:#c2ccb8;
+      --vb-sage-dark:#4e5c45;
+      --vb-gold:#b8975a;
+      --vb-gold-light:#d4c49a;
+      --vb-charcoal:#2a2a28;
+      --vb-text:#3d3d3b;
+      --vb-text-muted:#7a7a76;
+      --vb-white:#ffffff;
+      --vb-border:#e2ddd4;
+      --vb-rose:#c4a68a;
+      --font-display:'Cormorant Garamond',Georgia,serif;
+      --font-body:'DM Sans',system-ui,sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+
+    html{scroll-behavior:smooth;font-size:16px}
+    body{
+      font-family:var(--font-body);
+      color:var(--vb-text);
+      background:var(--vb-cream);
+      line-height:1.7;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── Hero ── */
+    .hero{
+      background:linear-gradient(165deg,var(--vb-charcoal) 0%,#3a3f35 40%,var(--vb-sage-dark) 100%);
+      color:var(--vb-cream);
+      padding:6rem 2rem 5rem;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:'';position:absolute;inset:0;
+      background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-content{position:relative;z-index:1;max-width:860px;margin:0 auto}
+    .hero-eyebrow{
+      font-family:var(--font-mono);
+      font-size:.75rem;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      color:var(--vb-sage-light);
+      margin-bottom:1.5rem;
+      display:flex;align-items:center;justify-content:center;gap:.75rem;
+    }
+    .hero-eyebrow::before,.hero-eyebrow::after{
+      content:'';width:2rem;height:1px;background:var(--vb-sage-light);opacity:.5;
+    }
+    .hero h1{
+      font-family:var(--font-display);
+      font-size:clamp(2.4rem,5.5vw,4rem);
+      font-weight:700;
+      line-height:1.15;
+      margin-bottom:1.25rem;
+      letter-spacing:-.01em;
+    }
+    .hero h1 span{color:var(--vb-gold-light)}
+    .hero-sub{
+      font-size:1.05rem;
+      color:var(--vb-sage-light);
+      max-width:620px;
+      margin:0 auto 2.5rem;
+      line-height:1.65;
+    }
+    .hero-stats{
+      display:flex;flex-wrap:wrap;justify-content:center;gap:2rem 3rem;
+      padding-top:2rem;
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+    .hero-stat{text-align:center}
+    .hero-stat .num{
+      font-family:var(--font-display);
+      font-size:2rem;font-weight:700;
+      color:var(--vb-gold-light);
+      display:block;
+    }
+    .hero-stat .label{
+      font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--vb-sage-light);opacity:.8;
+    }
+
+    /* ── Layout ── */
+    .container{max-width:1060px;margin:0 auto;padding:0 2rem}
+    section{padding:5rem 0}
+    section+section{border-top:1px solid var(--vb-border)}
+
+    /* ── Section headings ── */
+    .section-num{
+      font-family:var(--font-mono);
+      font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+      color:var(--vb-sage);
+      margin-bottom:.5rem;
+    }
+    h2{
+      font-family:var(--font-display);
+      font-size:clamp(1.8rem,3.5vw,2.5rem);
+      font-weight:700;color:var(--vb-charcoal);
+      margin-bottom:.75rem;line-height:1.2;
+    }
+    h3{
+      font-family:var(--font-display);
+      font-size:1.4rem;font-weight:600;
+      color:var(--vb-charcoal);
+      margin:2.5rem 0 .75rem;
+    }
+    .section-lead{
+      font-size:1.05rem;color:var(--vb-text-muted);
+      max-width:680px;margin-bottom:2.5rem;line-height:1.65;
+    }
+
+    /* ── Prose ── */
+    p{margin-bottom:1rem}
+    strong{color:var(--vb-charcoal);font-weight:600}
+    code{
+      font-family:var(--font-mono);font-size:.85em;
+      background:var(--vb-linen);padding:.15em .4em;border-radius:4px;
+      color:var(--vb-sage-dark);
+    }
+
+    /* ── Dashboard gallery ── */
+    .dashboard-grid{display:grid;gap:2.5rem;margin-top:2rem}
+    .dash-card{
+      background:var(--vb-white);
+      border:1px solid var(--vb-border);
+      border-radius:12px;
+      overflow:hidden;
+      transition:box-shadow .3s ease,transform .3s ease;
+    }
+    .dash-card:hover{
+      box-shadow:0 12px 40px rgba(42,42,40,.08);
+      transform:translateY(-3px);
+    }
+    .dash-card img{
+      width:100%;display:block;
+      border-bottom:1px solid var(--vb-border);
+    }
+    .dash-card-body{padding:1.5rem 1.75rem}
+    .dash-card-body h3{margin-top:0;margin-bottom:.5rem;font-size:1.25rem}
+    .dash-card-body p{color:var(--vb-text-muted);font-size:.92rem;margin-bottom:0}
+
+    /* ── Process timeline ── */
+    .process-timeline{
+      position:relative;
+      padding-left:2.5rem;
+      margin-top:2rem;
+    }
+    .process-timeline::before{
+      content:'';position:absolute;left:.55rem;top:.5rem;bottom:.5rem;
+      width:2px;background:var(--vb-sage-light);
+    }
+    .process-step{
+      position:relative;
+      margin-bottom:2rem;
+      padding-left:1.5rem;
+    }
+    .process-step::before{
+      content:'';position:absolute;
+      left:-2rem;top:.55rem;
+      width:12px;height:12px;border-radius:50%;
+      background:var(--vb-sage);
+      border:3px solid var(--vb-cream);
+      box-shadow:0 0 0 2px var(--vb-sage-light);
+    }
+    .process-step h3{margin-top:0;font-size:1.15rem}
+    .process-step p{color:var(--vb-text-muted);font-size:.93rem;margin-bottom:0}
+
+    /* ── Insight cards ── */
+    .insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:2rem}
+    .insight-card{
+      background:var(--vb-white);
+      border:1px solid var(--vb-border);
+      border-radius:10px;
+      padding:1.75rem;
+      transition:box-shadow .3s ease;
+    }
+    .insight-card:hover{box-shadow:0 8px 30px rgba(42,42,40,.06)}
+    .insight-card h3{margin-top:0;margin-bottom:.5rem;font-size:1.1rem}
+    .insight-card .highlight{
+      font-family:var(--font-display);
+      font-size:1.8rem;font-weight:700;
+      color:var(--vb-sage-dark);
+      display:block;margin-bottom:.5rem;
+    }
+    .insight-card p,.insight-card ul{color:var(--vb-text-muted);font-size:.9rem}
+    .insight-card ul{padding-left:1.2rem;margin-top:.5rem}
+    .insight-card ul li{margin-bottom:.3rem}
+
+    /* ── Chart: Donut (polished interactive) ── */
+    .chart-donut-wrap{display:flex;align-items:center;gap:1.5rem;margin:.75rem 0}
+    .donut-chart{width:150px;height:150px;flex-shrink:0;transform:rotate(-90deg)}
+    .donut-chart text{transform:rotate(90deg);transform-origin:center}
+    .donut-arc{
+      stroke-dasharray:0 377;
+      transition:stroke-dasharray 1.4s cubic-bezier(.25,.46,.45,.94),
+                 opacity .2s ease, filter .2s ease;
+      cursor:pointer;
+    }
+    .visible .donut-arc{stroke-dasharray:var(--target) 377}
+    .donut-arc:hover{filter:brightness(1.15);opacity:1 !important}
+    .donut-chart:hover .donut-arc:not(:hover){opacity:.45}
+    .donut-legend{display:flex;flex-direction:column;gap:.5rem;font-size:.82rem;color:var(--vb-text-muted)}
+    .donut-legend span{
+      display:flex;align-items:center;gap:.5rem;
+      padding:.3rem .5rem;border-radius:6px;
+      transition:background .2s ease;cursor:default;
+    }
+    .donut-legend span:hover{background:var(--vb-linen)}
+    .donut-legend i{display:inline-block;width:12px;height:12px;border-radius:4px;flex-shrink:0}
+    .donut-center-val{
+      font-family:var(--font-display);font-weight:700;
+      fill:var(--vb-charcoal);
+    }
+    .donut-center-lbl{
+      font-family:var(--font-body);
+      fill:var(--vb-text-muted);
+    }
+
+    /* donut large variant (delay analysis) */
+    .donut-chart--lg{width:180px;height:180px;display:block;margin:0 auto;transform:rotate(-90deg)}
+    .donut-chart--lg text{transform:rotate(90deg);transform-origin:center}
+
+    /* ── Donut tooltip ── */
+    .donut-tooltip{
+      position:absolute;
+      background:var(--vb-charcoal);color:var(--vb-cream);
+      font-size:.78rem;font-weight:500;
+      padding:.4rem .75rem;border-radius:6px;
+      pointer-events:none;opacity:0;
+      transition:opacity .15s ease;
+      white-space:nowrap;z-index:10;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+    }
+    .donut-tooltip.show{opacity:1}
+
+    /* ── Chart: KPI row ── */
+    .kpi-row{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--vb-border)}
+    .kpi{text-align:center}
+    .kpi-val{font-family:var(--font-display);font-size:1.15rem;font-weight:700;color:var(--vb-charcoal);display:block}
+    .kpi-label{font-size:.68rem;color:var(--vb-text-muted);letter-spacing:.04em;text-transform:uppercase}
+
+    /* ── Chart: Horizontal bars ── */
+    .hbar-chart{display:flex;flex-direction:column;gap:.65rem}
+    .hbar-item{position:relative;cursor:default}
+    .hbar-label{font-size:.78rem;font-weight:500;color:var(--vb-text);display:block;margin-bottom:.2rem}
+    .hbar-track{background:var(--vb-linen);border-radius:6px;height:26px;overflow:hidden;position:relative}
+    .hbar-fill{
+      height:100%;border-radius:6px;
+      display:flex;align-items:center;justify-content:flex-end;padding-right:.6rem;
+      width:0;
+      transition:width 1s cubic-bezier(.4,0,.2,1);
+    }
+    .visible .hbar-fill{width:var(--w)}
+    .hbar-fill span{font-size:.72rem;font-weight:600;color:var(--vb-white)}
+    .hbar-item:hover .hbar-fill{filter:brightness(1.1)}
+    .hbar-item::after{
+      content:attr(data-tooltip);
+      position:absolute;top:-28px;left:50%;transform:translateX(-50%);
+      background:var(--vb-charcoal);color:var(--vb-cream);
+      font-size:.72rem;padding:.25rem .6rem;border-radius:5px;
+      white-space:nowrap;opacity:0;pointer-events:none;
+      transition:opacity .2s ease;z-index:2;
+    }
+    .hbar-item:hover::after{opacity:1}
+
+    /* ── Chart: Vertical bars ── */
+    .vbar-chart{
+      display:flex;align-items:flex-end;justify-content:space-between;
+      gap:.35rem;height:140px;padding-top:1.25rem;
+      border-bottom:1.5px solid var(--vb-border);
+      margin-bottom:.5rem;
+    }
+    .vbar-chart--compact{height:110px}
+    .vbar-col{
+      flex:1;display:flex;flex-direction:column;align-items:center;
+      gap:.25rem;cursor:default;position:relative;
+    }
+    .vbar-value{font-size:.72rem;font-weight:600;color:var(--vb-charcoal)}
+    .vbar-bar{
+      width:100%;max-width:36px;border-radius:4px 4px 0 0;
+      height:0;
+      transition:height 1s cubic-bezier(.4,0,.2,1);
+    }
+    .visible .vbar-bar{height:var(--h)}
+    .vbar-day{font-size:.68rem;color:var(--vb-text-muted);margin-top:.15rem}
+    .vbar-col:hover .vbar-bar{filter:brightness(1.1)}
+    .vbar-col::after{
+      content:attr(data-tooltip);
+      position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+      background:var(--vb-charcoal);color:var(--vb-cream);
+      font-size:.7rem;padding:.2rem .5rem;border-radius:4px;
+      white-space:nowrap;opacity:0;pointer-events:none;
+      transition:opacity .2s ease;z-index:2;
+    }
+    .vbar-col:hover::after{opacity:1}
+
+    /* ── Chart: Lollipop ── */
+    .lollipop-chart{display:flex;flex-direction:column;gap:.55rem}
+    .lolli-item{display:flex;align-items:center;gap:.5rem;cursor:default;position:relative}
+    .lolli-label{font-size:.76rem;font-weight:500;color:var(--vb-text);width:70px;flex-shrink:0;text-align:right}
+    .lolli-track{flex:1;height:18px;position:relative}
+    .lolli-line{
+      position:absolute;top:50%;left:0;height:2px;
+      background:var(--vb-border);
+      width:0;
+      transition:width 1s cubic-bezier(.4,0,.2,1);
+      transform:translateY(-50%);
+    }
+    .visible .lolli-line{width:var(--w)}
+    .lolli-dot{
+      position:absolute;top:50%;
+      width:12px;height:12px;border-radius:50%;
+      left:0;
+      transform:translate(-50%,-50%);
+      transition:left 1s cubic-bezier(.4,0,.2,1);
+      box-shadow:0 0 0 3px rgba(122,139,111,.15);
+    }
+    .visible .lolli-dot{left:var(--w)}
+    .lolli-dot:hover{transform:translate(-50%,-50%) scale(1.3)}
+    .lolli-val{font-size:.74rem;font-weight:600;color:var(--vb-charcoal);width:48px;flex-shrink:0}
+    .lolli-item::after{
+      content:attr(data-tooltip);
+      position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+      background:var(--vb-charcoal);color:var(--vb-cream);
+      font-size:.7rem;padding:.2rem .5rem;border-radius:4px;
+      white-space:nowrap;opacity:0;pointer-events:none;
+      transition:opacity .2s ease;z-index:2;
+    }
+    .lolli-item:hover::after{opacity:1}
+
+    /* ── Chart footnote ── */
+    .chart-footnote{font-size:.75rem;color:var(--vb-text-muted);margin-top:.4rem;font-style:italic}
+
+    /* ── Dashboard chart area ── */
+    .dash-chart-area{
+      padding:1.5rem;
+      background:var(--vb-linen);
+      border-bottom:1px solid var(--vb-border);
+    }
+    .dash-header{
+      font-family:var(--font-display);
+      font-size:1.2rem;font-weight:700;
+      color:var(--vb-charcoal);
+      text-align:center;
+      padding:.6rem 1rem;
+      background:var(--vb-sage-dark);
+      color:var(--vb-cream);
+      border-radius:8px;
+      margin-bottom:1.25rem;
+      letter-spacing:.02em;
+    }
+    .dash-kpi-strip{
+      display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;
+      margin-bottom:1rem;
+    }
+    .dash-kpi{
+      background:var(--vb-sage-dark);color:var(--vb-cream);
+      border-radius:8px;padding:.6rem 1rem;text-align:center;
+      flex:1 1 120px;min-width:100px;
+    }
+    .dash-kpi.accent{background:var(--vb-sage)}
+    .dash-kpi-num{font-family:var(--font-display);font-size:1.3rem;font-weight:700;display:block;color:var(--vb-gold-light)}
+    .dash-kpi-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+    .dash-kpi-strip--secondary{gap:.4rem}
+    .dash-kpi-strip--secondary .dash-kpi-sm{
+      background:var(--vb-white);border:1px solid var(--vb-border);
+      border-radius:6px;padding:.5rem .6rem;text-align:center;
+      flex:1 1 80px;font-size:.72rem;color:var(--vb-text-muted);
+    }
+    .dash-kpi-sm strong{display:block;font-family:var(--font-display);font-size:1rem;color:var(--vb-charcoal)}
+    .dash-dual{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:.75rem}
+    @media(max-width:640px){.dash-dual{grid-template-columns:1fr}}
+    .dash-chart-title{
+      font-family:var(--font-body);font-size:.78rem;font-weight:600;
+      color:var(--vb-charcoal);margin-bottom:.5rem;
+      letter-spacing:.02em;
+    }
+    .hbar-chart--sm .hbar-item{margin-bottom:0}
+    .hbar-chart--sm .hbar-label{font-size:.7rem}
+    .hbar-chart--sm .hbar-track{height:20px}
+    .hbar-chart--sm .hbar-fill span{font-size:.65rem}
+    .hbar-chart--dense{gap:.35rem}
+
+    /* ── Dashboard tables ── */
+    .dash-table{
+      font-size:.78rem;
+      border:1px solid var(--vb-border);
+      border-radius:6px;overflow:hidden;
+    }
+    .dash-tr{
+      display:flex;gap:.5rem;padding:.4rem .7rem;
+      border-bottom:1px solid var(--vb-border);
+      align-items:center;
+    }
+    .dash-tr:last-child{border-bottom:none}
+    .dash-tr--head{
+      background:var(--vb-sage-dark);color:var(--vb-cream);
+      font-weight:600;font-size:.7rem;letter-spacing:.03em;
+    }
+    .dash-tr:not(.dash-tr--head){background:var(--vb-white)}
+    .dash-tr:not(.dash-tr--head):nth-child(even){background:var(--vb-linen)}
+    .dash-tr span{flex:1}
+    .dash-tr span:last-child{text-align:right;flex:0 0 auto;min-width:50px}
+    .dash-table--compact .dash-tr{padding:.3rem .6rem}
+    .dash-table--compact .dash-tr span:first-child{flex:0 0 55px}
+
+    /* ── Gauge (half-circle for cancellations) ── */
+    .gauge-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .gauge-item{text-align:center}
+    .gauge-svg{width:90px;height:55px;display:block;margin:0 auto}
+    .gauge-arc{
+      stroke-dasharray:0 141.37;
+      transition:stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .visible .gauge-arc{stroke-dasharray:var(--target) 141.37}
+    .gauge-val{font-family:var(--font-display);font-size:1.15rem;font-weight:700;color:var(--vb-charcoal);margin-top:-.25rem}
+    .gauge-lbl{font-size:.68rem;color:var(--vb-text-muted);text-transform:uppercase;letter-spacing:.04em}
+
+    /* ── Sparkline row (year trend) ── */
+    .sparkline-row{
+      display:flex;gap:.35rem;align-items:flex-end;
+      padding:.5rem 0;flex-wrap:wrap;
+    }
+    .spark-pt{
+      text-align:center;flex:1;min-width:32px;
+    }
+    .spark-pt strong{
+      display:block;font-family:var(--font-display);font-size:.95rem;
+      color:var(--vb-sage-dark);
+    }
+    .spark-pt.neg strong{color:var(--vb-rose)}
+    .spark-pt.hi strong{color:var(--vb-gold);font-size:1.1rem}
+    .spark-pt small{font-size:.6rem;color:var(--vb-text-muted);display:block}
+
+    /* (donut-chart--lg defined above) */
+
+    /* ── Conclusion cards ── */
+    .conclusion-list{
+      counter-reset:conclusion;
+      display:grid;gap:1.25rem;margin-top:2rem;
+    }
+    .conclusion-item{
+      counter-increment:conclusion;
+      display:flex;gap:1.25rem;align-items:flex-start;
+      background:var(--vb-white);
+      border:1px solid var(--vb-border);
+      border-radius:10px;
+      padding:1.5rem 1.75rem;
+    }
+    .conclusion-item::before{
+      content:counter(conclusion);
+      font-family:var(--font-display);
+      font-size:1.6rem;font-weight:700;
+      color:var(--vb-gold);
+      flex-shrink:0;width:2rem;text-align:center;
+      line-height:1.3;
+    }
+    .conclusion-item div h4{
+      font-family:var(--font-display);font-size:1.1rem;
+      font-weight:600;color:var(--vb-charcoal);margin-bottom:.3rem;
+    }
+    .conclusion-item div p{color:var(--vb-text-muted);font-size:.9rem;margin:0}
+
+    /* ── Tags ── */
+    .tag-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
+    .tag{
+      font-size:.75rem;font-weight:500;
+      padding:.35rem .8rem;border-radius:20px;
+      background:var(--vb-linen);color:var(--vb-sage-dark);
+      letter-spacing:.02em;
+    }
+
+    /* ── Buttons ── */
+    .btn-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+    .btn{
+      display:inline-flex;align-items:center;gap:.5rem;
+      font-family:var(--font-body);font-size:.88rem;font-weight:600;
+      padding:.7rem 1.5rem;border-radius:8px;
+      text-decoration:none;transition:all .25s ease;
+    }
+    .btn-primary{
+      background:var(--vb-sage);color:var(--vb-cream);
+    }
+    .btn-primary:hover{background:var(--vb-sage-dark)}
+    .btn-outline{
+      background:transparent;color:var(--vb-sage-dark);
+      border:1.5px solid var(--vb-sage-light);
+    }
+    .btn-outline:hover{background:var(--vb-linen)}
+
+    /* ── Notes box ── */
+    .note-box{
+      background:var(--vb-linen);
+      border-left:3px solid var(--vb-gold);
+      border-radius:0 8px 8px 0;
+      padding:1.5rem 1.75rem;
+      margin-top:2rem;
+    }
+    .note-box h3{margin-top:0;font-size:1.05rem}
+    .note-box p{font-size:.9rem;color:var(--vb-text-muted);margin-bottom:.5rem}
+    .note-box p:last-child{margin-bottom:0}
+
+    /* ── Footer ── */
+    footer{
+      background:var(--vb-charcoal);
+      color:var(--vb-sage-light);
+      text-align:center;
+      padding:3rem 2rem;
+      font-size:.88rem;
+    }
+    footer strong{color:var(--vb-cream)}
+    footer .footer-tags{
+      margin-top:.75rem;
+      font-size:.78rem;letter-spacing:.06em;
+      color:var(--vb-text-muted);
+    }
+    footer a{color:var(--vb-gold-light);text-decoration:none}
+    footer a:hover{text-decoration:underline}
+
+    /* ── Responsive ── */
+    @media(max-width:640px){
+      .hero{padding:4rem 1.5rem 3.5rem}
+      section{padding:3.5rem 0}
+      .container{padding:0 1.25rem}
+      .hero-stats{gap:1.25rem 2rem}
+      .insight-grid{grid-template-columns:1fr}
+    }
+
+    /* ── Fade-in on scroll ── */
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+  </style>
+</head>
+<body>
+
+<!-- ════════════ HERO ════════════ -->
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">Business Intelligence &middot; Operations Analytics</div>
+    <h1>US Flights Operations<br><span>Delay Analysis</span></h1>
+    <p class="hero-sub">An end-to-end analytical review of US domestic flight operations &mdash; diagnosing systemic inefficiencies across delays, cancellations, reliability, economic cost, and environmental impact.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="num">5.65M</span><span class="label">Total Flights</span></div>
+      <div class="hero-stat"><span class="num">82%</span><span class="label">On-Time Rate</span></div>
+      <div class="hero-stat"><span class="num">10 yrs</span><span class="label">Data Span</span></div>
+      <div class="hero-stat"><span class="num">8</span><span class="label">Dashboards</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════ ABOUT ════════════ -->
+<section>
+  <div class="container reveal">
+    <div class="section-num">01 &mdash; About</div>
+    <h2>Project Overview</h2>
+    <p class="section-lead">This project transforms millions of flight records into decision-ready insights for airlines, airports, regulators, and operations teams. The goal is not just reporting but diagnosing systemic operational inefficiencies and highlighting where performance, reliability, cost control, and sustainability can be improved.</p>
+    <p>Modern aviation systems are highly interconnected &mdash; a delay at one airport or route can cascade across an entire network. This project explores <strong>how, when, where, and why</strong> these disruptions occur across network-wide operational performance, root causes of delays, airline and airport reliability benchmarking, route-level risk identification, and financial and environmental externalities of inefficiency.</p>
+    <p>The analysis spans <strong>10 years</strong> and over <strong>5.6 million flights</strong>, enabling both trend analysis and structural performance comparisons.</p>
+  </div>
+</section>
+
+<!-- ════════════ KEY INSIGHTS ════════════ -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-num">02 &mdash; Findings</div>
+      <h2>Key Insights</h2>
+      <p class="section-lead">Critical findings across system performance, operational efficiency, reliability, infrastructure, financial cost, and sustainability.</p>
+    </div>
+
+    <div class="insight-grid">
+
+      <!-- 1 ── Executive Performance: Donut + KPIs ── -->
+      <div class="insight-card reveal">
+        <h3>Executive Performance</h3>
+        <div class="chart-donut-wrap" style="position:relative">
+          <svg class="donut-chart" viewBox="0 0 180 180">
+            <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-linen)" stroke-width="22"/>
+            <!-- Completed: 82.03% → 82.03/100 * 2π*68 ≈ 350.5 of 427.3 -->
+            <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-sage)" stroke-width="22"
+              stroke-dasharray="350.5 427.3" stroke-dashoffset="106.8"
+              stroke-linecap="round" class="donut-arc" style="--target:350.5"
+              data-label="Completed Flights: 5.5M (82.03%)"/>
+            <!-- Cancelled: 2.78% → 11.9 of 427.3 -->
+            <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-gold)" stroke-width="22"
+              stroke-dasharray="11.9 427.3" stroke-dashoffset="-243.7"
+              stroke-linecap="round" class="donut-arc" style="--target:11.9"
+              data-label="Cancelled Flights: 157.25K (2.78%)"/>
+            <!-- Delayed (non-cancellation gap): ~15.19% -->
+            <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-rose)" stroke-width="22"
+              stroke-dasharray="64.9 427.3" stroke-dashoffset="-255.6"
+              stroke-linecap="round" class="donut-arc" style="--target:64.9"
+              data-label="Delayed Flights: 33.88% delay rate"/>
+            <!-- Center text -->
+            <text x="90" y="82" text-anchor="middle" class="donut-center-val" font-size="30">82%</text>
+            <text x="90" y="102" text-anchor="middle" class="donut-center-lbl" font-size="10">On-Time</text>
+          </svg>
+          <div class="donut-legend">
+            <span><i style="background:var(--vb-sage)"></i> Completed &mdash; 5.5M</span>
+            <span><i style="background:var(--vb-rose)"></i> Delayed &mdash; 33.88%</span>
+            <span><i style="background:var(--vb-gold)"></i> Cancelled &mdash; 157.25K</span>
+          </div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi"><span class="kpi-val">5.65M</span><span class="kpi-label">Total Flights</span></div>
+          <div class="kpi"><span class="kpi-val">9.64 min</span><span class="kpi-label">Avg Dep Delay</span></div>
+          <div class="kpi"><span class="kpi-val">3.72 min</span><span class="kpi-label">Avg Arr Delay</span></div>
+          <div class="kpi"><span class="kpi-val">2.78%</span><span class="kpi-label">Cancellation Rate</span></div>
+        </div>
+      </div>
+
+      <!-- 2 ── Delay Root Causes: Horizontal bar chart ── -->
+      <div class="insight-card reveal">
+        <h3>Delay Root Causes</h3>
+        <div class="hbar-chart">
+          <div class="hbar-item" data-tooltip="Late Aircraft: 33.73%">
+            <span class="hbar-label">Late Aircraft</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>33.73%</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Carrier: 32.41%">
+            <span class="hbar-label">Carrier</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:96%;background:var(--vb-sage)"><span>32.41%</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Weather: 19.80%">
+            <span class="hbar-label">Weather</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:58.7%;background:var(--vb-gold)"><span>19.80%</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="NAS: 6.58%">
+            <span class="hbar-label">NAS</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:19.5%;background:var(--vb-rose)"><span>6.58%</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Security: 0.16%">
+            <span class="hbar-label">Security</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:2%;background:var(--vb-sage-light)"><span>0.16%</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 ── Temporal Patterns: Day-of-week bar chart ── -->
+      <div class="insight-card reveal">
+        <h3>Temporal Patterns</h3>
+        <div class="vbar-chart">
+          <div class="vbar-col" data-tooltip="Mon: 6.7 min">
+            <div class="vbar-value">6.7</div>
+            <div class="vbar-bar" style="--h:100%;background:var(--vb-sage-dark)"></div>
+            <div class="vbar-day">Mon</div>
+          </div>
+          <div class="vbar-col" data-tooltip="Tue: 4.2 min">
+            <div class="vbar-value">4.2</div>
+            <div class="vbar-bar" style="--h:62.7%;background:var(--vb-sage)"></div>
+            <div class="vbar-day">Tue</div>
+          </div>
+          <div class="vbar-col" data-tooltip="Wed: 1.9 min">
+            <div class="vbar-value">1.9</div>
+            <div class="vbar-bar" style="--h:28.4%;background:var(--vb-sage-light)"></div>
+            <div class="vbar-day">Wed</div>
+          </div>
+          <div class="vbar-col" data-tooltip="Thu: 3.8 min">
+            <div class="vbar-value">3.8</div>
+            <div class="vbar-bar" style="--h:56.7%;background:var(--vb-sage)"></div>
+            <div class="vbar-day">Thu</div>
+          </div>
+          <div class="vbar-col" data-tooltip="Fri: 5.1 min">
+            <div class="vbar-value">5.1</div>
+            <div class="vbar-bar" style="--h:76.1%;background:var(--vb-sage)"></div>
+            <div class="vbar-day">Fri</div>
+          </div>
+          <div class="vbar-col" data-tooltip="Sat: 2.5 min">
+            <div class="vbar-value">2.5</div>
+            <div class="vbar-bar" style="--h:37.3%;background:var(--vb-sage-light)"></div>
+            <div class="vbar-day">Sat</div>
+          </div>
+          <div class="vbar-col" data-tooltip="Sun: 4.9 min">
+            <div class="vbar-value">4.9</div>
+            <div class="vbar-bar" style="--h:73.1%;background:var(--vb-sage)"></div>
+            <div class="vbar-day">Sun</div>
+          </div>
+        </div>
+        <p class="chart-footnote">Avg arrival delay (min) by day of week &middot; 33.88% of all flights delayed</p>
+      </div>
+
+      <!-- 4 ── Airline Reliability: Lollipop chart ── -->
+      <div class="insight-card reveal">
+        <h3>Airline Reliability</h3>
+        <div class="lollipop-chart">
+          <div class="lolli-item" data-tooltip="Hawaiian: 86.21%">
+            <span class="lolli-label">Hawaiian</span>
+            <div class="lolli-track">
+              <div class="lolli-line" style="--w:86.21%"></div>
+              <div class="lolli-dot" style="--w:86.21%;background:var(--vb-sage-dark)"></div>
+            </div>
+            <span class="lolli-val">86.21%</span>
+          </div>
+          <div class="lolli-item" data-tooltip="Delta: 85.49%">
+            <span class="lolli-label">Delta</span>
+            <div class="lolli-track">
+              <div class="lolli-line" style="--w:85.49%"></div>
+              <div class="lolli-dot" style="--w:85.49%;background:var(--vb-sage)"></div>
+            </div>
+            <span class="lolli-val">85.49%</span>
+          </div>
+          <div class="lolli-item" data-tooltip="Southwest: 83.74%">
+            <span class="lolli-label">Southwest</span>
+            <div class="lolli-track">
+              <div class="lolli-line" style="--w:83.74%"></div>
+              <div class="lolli-dot" style="--w:83.74%;background:var(--vb-sage)"></div>
+            </div>
+            <span class="lolli-val">83.74%</span>
+          </div>
+          <div class="lolli-item" data-tooltip="Envoy Air: 74.49%">
+            <span class="lolli-label">Envoy Air</span>
+            <div class="lolli-track">
+              <div class="lolli-line" style="--w:74.49%"></div>
+              <div class="lolli-dot" style="--w:74.49%;background:var(--vb-gold)"></div>
+            </div>
+            <span class="lolli-val">74.49%</span>
+          </div>
+          <div class="lolli-item" data-tooltip="Frontier: 74.46%">
+            <span class="lolli-label">Frontier</span>
+            <div class="lolli-track">
+              <div class="lolli-line" style="--w:74.46%"></div>
+              <div class="lolli-dot" style="--w:74.46%;background:var(--vb-rose)"></div>
+            </div>
+            <span class="lolli-val">74.46%</span>
+          </div>
+          <div class="lolli-item" data-tooltip="JetBlue: 72.45%">
+            <span class="lolli-label">JetBlue</span>
+            <div class="lolli-track">
+              <div class="lolli-line" style="--w:72.45%"></div>
+              <div class="lolli-dot" style="--w:72.45%;background:var(--vb-rose)"></div>
+            </div>
+            <span class="lolli-val">72.45%</span>
+          </div>
+        </div>
+        <p class="chart-footnote">Reliability score (%) &middot; 14-point spread between best and worst</p>
+      </div>
+
+      <!-- 5 ── Infrastructure Bottlenecks: Horizontal bars ── -->
+      <div class="insight-card reveal">
+        <h3>Infrastructure Bottlenecks</h3>
+        <p style="font-size:.85rem;color:var(--vb-text-muted);margin-bottom:1rem">Highest cancellation rates by airport</p>
+        <div class="hbar-chart">
+          <div class="hbar-item" data-tooltip="Morgantown: 25.81%">
+            <span class="hbar-label">Morgantown</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>25.81%</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Watertown: 24.19%">
+            <span class="hbar-label">Watertown</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:93.7%;background:var(--vb-sage)"><span>24.19%</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Mammoth Lakes: 19.62%">
+            <span class="hbar-label">Mammoth Lakes</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:76%;background:var(--vb-gold)"><span>19.62%</span></div></div>
+          </div>
+        </div>
+        <p class="chart-footnote">Regional airports show 15&ndash;25% cancellation rates vs. 2.78% national average</p>
+      </div>
+
+      <!-- 6 ── Route Failures: Horizontal bars ── -->
+      <div class="insight-card reveal">
+        <h3>Route Failures</h3>
+        <p style="font-size:.85rem;color:var(--vb-text-muted);margin-bottom:1rem">Avg delay (min) on worst routes &middot; all at 100% delay rate</p>
+        <div class="hbar-chart">
+          <div class="hbar-item" data-tooltip="CAK → TYS: 1,237 min">
+            <span class="hbar-label">CAK&rarr;TYS</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>1,237</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="MDT → HPN: 798 min">
+            <span class="hbar-label">MDT&rarr;HPN</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:64.5%;background:var(--vb-sage)"><span>798</span></div></div>
+          </div>
+        </div>
+        <p class="chart-footnote">Minutes average delay &middot; systematic failures requiring network redesign</p>
+      </div>
+
+      <!-- 7 ── Financial Impact: Vertical bars by time of day ── -->
+      <div class="insight-card reveal">
+        <h3>Financial Impact</h3>
+        <span class="highlight">$1.21B</span>
+        <p style="font-size:.85rem;color:var(--vb-text-muted);margin-bottom:.75rem">2024 peak &middot; cost by time-of-day window</p>
+        <div class="vbar-chart vbar-chart--compact">
+          <div class="vbar-col" data-tooltip="5 AM: $25M+">
+            <div class="vbar-value" style="font-size:.65rem">$25M</div>
+            <div class="vbar-bar" style="--h:4.2%;background:var(--vb-sage-light)"></div>
+            <div class="vbar-day">5a</div>
+          </div>
+          <div class="vbar-col" data-tooltip="8 AM: $180M+">
+            <div class="vbar-value" style="font-size:.65rem">$180M</div>
+            <div class="vbar-bar" style="--h:30%;background:var(--vb-sage)"></div>
+            <div class="vbar-day">8a</div>
+          </div>
+          <div class="vbar-col" data-tooltip="12 PM: $350M+">
+            <div class="vbar-value" style="font-size:.65rem">$350M</div>
+            <div class="vbar-bar" style="--h:58.3%;background:var(--vb-sage)"></div>
+            <div class="vbar-day">12p</div>
+          </div>
+          <div class="vbar-col" data-tooltip="4 PM: $480M+">
+            <div class="vbar-value" style="font-size:.65rem">$480M</div>
+            <div class="vbar-bar" style="--h:80%;background:var(--vb-sage-dark)"></div>
+            <div class="vbar-day">4p</div>
+          </div>
+          <div class="vbar-col" data-tooltip="7-10 PM: $600M+">
+            <div class="vbar-value" style="font-size:.65rem">$600M+</div>
+            <div class="vbar-bar" style="--h:100%;background:var(--vb-gold)"></div>
+            <div class="vbar-day">7-10p</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 ── Environmental Impact: Horizontal bars ── -->
+      <div class="insight-card reveal">
+        <h3>Environmental Impact</h3>
+        <span class="highlight">26M tonnes CO₂</span>
+        <p style="font-size:.85rem;color:var(--vb-text-muted);margin-bottom:.75rem">2024 peak &middot; top emitting airports (M metric tons)</p>
+        <div class="hbar-chart">
+          <div class="hbar-item" data-tooltip="O'Hare: 10.1M tons">
+            <span class="hbar-label">O&rsquo;Hare</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>10.1M</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Atlanta: 8.6M tons">
+            <span class="hbar-label">Atlanta</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:85.1%;background:var(--vb-sage)"><span>8.6M</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Dallas/Fort Worth: 7.8M tons">
+            <span class="hbar-label">DFW</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:77.2%;background:var(--vb-gold)"><span>7.8M</span></div></div>
+          </div>
+          <div class="hbar-item" data-tooltip="Denver: 7.4M tons">
+            <span class="hbar-label">Denver</span>
+            <div class="hbar-track"><div class="hbar-fill" style="--w:73.3%;background:var(--vb-rose)"><span>7.4M</span></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Conclusions -->
+    <div class="reveal" style="margin-top:3.5rem">
+      <h3>Business Conclusions</h3>
+      <div class="conclusion-list">
+        <div class="conclusion-item">
+          <div>
+            <h4>Regional Airport Risk</h4>
+            <p>Smaller airports show disproportionately high cancellation rates (15&ndash;25%), indicating service reliability challenges.</p>
+          </div>
+        </div>
+        <div class="conclusion-item">
+          <div>
+            <h4>Carrier Reliability Gap</h4>
+            <p>14-point spread between best (Hawaiian 86%) and worst (JetBlue 72%) performers indicates operational excellence opportunities.</p>
+          </div>
+        </div>
+        <div class="conclusion-item">
+          <div>
+            <h4>Time-of-Day Vulnerability</h4>
+            <p>Late evening operations accumulate delays throughout the day, suggesting schedule compression issues.</p>
+          </div>
+        </div>
+        <div class="conclusion-item">
+          <div>
+            <h4>Environmental Liability</h4>
+            <p>CO₂ emissions from delays represent significant sustainability risk and potential regulatory exposure.</p>
+          </div>
+        </div>
+        <div class="conclusion-item">
+          <div>
+            <h4>Route-Specific Failures</h4>
+            <p>Routes with 100% delay rates indicate systematic problems requiring network redesign.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ DASHBOARDS ════════════ -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-num">03 &mdash; Dashboards</div>
+      <h2>Power BI Report Suite</h2>
+      <p class="section-lead">Eight focused analytical dashboards organized for stakeholders at every level &mdash; from executive KPIs to granular route-level diagnostics. Each page is purpose-built to answer a specific set of business questions.</p>
+    </div>
+
+    <div class="dashboard-grid">
+
+      <!-- ═══ 1. EXECUTIVE OVERVIEW ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Executive Overview</div>
+          <div class="dash-kpi-strip">
+            <div class="dash-kpi"><span class="dash-kpi-num">5.65M</span><span class="dash-kpi-lbl">Total Flights</span></div>
+            <div class="dash-kpi accent"><span class="dash-kpi-num">82.03%</span><span class="dash-kpi-lbl">On-Time Performance</span></div>
+            <div class="dash-kpi"><span class="dash-kpi-num">2.78%</span><span class="dash-kpi-lbl">Cancellation Rate</span></div>
+            <div class="dash-kpi"><span class="dash-kpi-num">67.77M</span><span class="dash-kpi-lbl">Total Delay Min (BTS)</span></div>
+          </div>
+          <div class="dash-kpi-strip dash-kpi-strip--secondary">
+            <div class="dash-kpi-sm">Completed<br><strong>5.5M</strong></div>
+            <div class="dash-kpi-sm">On Time<br><strong>4.51M</strong></div>
+            <div class="dash-kpi-sm">Avg Dep Delay<br><strong>9.64 min</strong></div>
+            <div class="dash-kpi-sm">Avg Arr Delay<br><strong>3.72 min</strong></div>
+            <div class="dash-kpi-sm">Cancelled<br><strong>157.25K</strong></div>
+          </div>
+          <div class="dash-dual">
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Worst Airports by Avg Arrival Delay</div>
+              <div class="hbar-chart hbar-chart--sm hbar-chart--dense">
+                <div class="hbar-item" data-tooltip="Jack McNamara Fi…: Rank 10"><span class="hbar-label">Jack McNamara Fi…</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>10</span></div></div></div>
+                <div class="hbar-item" data-tooltip="North Central We…: Rank 9"><span class="hbar-label">North Central We…</span><div class="hbar-track"><div class="hbar-fill" style="--w:90%;background:var(--vb-sage-dark)"><span>9</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Alpena County Re…: Rank 8"><span class="hbar-label">Alpena County Re…</span><div class="hbar-track"><div class="hbar-fill" style="--w:80%;background:var(--vb-sage)"><span>8</span></div></div></div>
+                <div class="hbar-item" data-tooltip="New Castle: Rank 7"><span class="hbar-label">New Castle</span><div class="hbar-track"><div class="hbar-fill" style="--w:70%;background:var(--vb-sage)"><span>7</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Tri-State/Milton J…: Rank 6"><span class="hbar-label">Tri-State/Milton J…</span><div class="hbar-track"><div class="hbar-fill" style="--w:60%;background:var(--vb-sage)"><span>6</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Williston Basin Int…: Rank 5"><span class="hbar-label">Williston Basin Int…</span><div class="hbar-track"><div class="hbar-fill" style="--w:50%;background:var(--vb-sage-light)"><span>5</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Dillingham Airport: Rank 4"><span class="hbar-label">Dillingham Airport</span><div class="hbar-track"><div class="hbar-fill" style="--w:40%;background:var(--vb-sage-light)"><span>4</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Central Wyoming…: Rank 3"><span class="hbar-label">Central Wyoming…</span><div class="hbar-track"><div class="hbar-fill" style="--w:30%;background:var(--vb-gold)"><span>3</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Morgantown Mu…: Rank 2"><span class="hbar-label">Morgantown Mu…</span><div class="hbar-track"><div class="hbar-fill" style="--w:20%;background:var(--vb-gold)"><span>2</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Youngstown-Warr…: Rank 1"><span class="hbar-label">Youngstown-Warr…</span><div class="hbar-track"><div class="hbar-fill" style="--w:10%;background:var(--vb-rose)"><span>1</span></div></div></div>
+              </div>
+            </div>
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Worst Airlines by Avg Arrival Delay</div>
+              <div class="hbar-chart hbar-chart--sm hbar-chart--dense">
+                <div class="hbar-item" data-tooltip="Mesa Airlines: Rank 10"><span class="hbar-label">Mesa Airlines</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-gold)"><span>10</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Virgin America: Rank 9"><span class="hbar-label">Virgin America</span><div class="hbar-track"><div class="hbar-fill" style="--w:90%;background:var(--vb-gold)"><span>9</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Spirit Air Lines: Rank 8"><span class="hbar-label">Spirit Air Lines</span><div class="hbar-track"><div class="hbar-fill" style="--w:80%;background:var(--vb-gold)"><span>8</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Envoy Air: Rank 7"><span class="hbar-label">Envoy Air</span><div class="hbar-track"><div class="hbar-fill" style="--w:70%;background:var(--vb-gold)"><span>7</span></div></div></div>
+                <div class="hbar-item" data-tooltip="ExpressJet Airlines: Rank 6"><span class="hbar-label">ExpressJet Airlines</span><div class="hbar-track"><div class="hbar-fill" style="--w:60%;background:var(--vb-gold)"><span>6</span></div></div></div>
+                <div class="hbar-item" data-tooltip="PSA Airlines: Rank 5"><span class="hbar-label">PSA Airlines</span><div class="hbar-track"><div class="hbar-fill" style="--w:50%;background:var(--vb-sage-light)"><span>5</span></div></div></div>
+                <div class="hbar-item" data-tooltip="SkyWest Airlines: Rank 4"><span class="hbar-label">SkyWest Airlines</span><div class="hbar-track"><div class="hbar-fill" style="--w:40%;background:var(--vb-sage-light)"><span>4</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Frontier Airlines: Rank 3"><span class="hbar-label">Frontier Airlines</span><div class="hbar-track"><div class="hbar-fill" style="--w:30%;background:var(--vb-rose)"><span>3</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Allegiant Air: Rank 2"><span class="hbar-label">Allegiant Air</span><div class="hbar-track"><div class="hbar-fill" style="--w:20%;background:var(--vb-rose)"><span>2</span></div></div></div>
+                <div class="hbar-item" data-tooltip="JetBlue Airways: Rank 1"><span class="hbar-label">JetBlue Airways</span><div class="hbar-track"><div class="hbar-fill" style="--w:10%;background:var(--vb-rose)"><span>1</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Executive Overview</h3>
+          <p>The entry point for the entire report. This page presents the system-wide health of US domestic aviation at a glance &mdash; total flights, on-time performance rate, cancellation rate, and average departure and arrival delays. KPI cards give leadership an immediate read on whether operations are improving or deteriorating, while summary visuals break down completed vs. cancelled flights and year-over-year performance trends.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 2. DELAY ANALYSIS ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Delay Analysis</div>
+          <div class="dash-kpi-strip">
+            <div class="dash-kpi"><span class="dash-kpi-num">73.7M</span><span class="dash-kpi-lbl">Total Delay Min (Ops)</span></div>
+            <div class="dash-kpi accent"><span class="dash-kpi-num">33.88%</span><span class="dash-kpi-lbl">Delay Rate</span></div>
+            <div class="dash-kpi"><span class="dash-kpi-num">1.86M</span><span class="dash-kpi-lbl">Delay Frequency</span></div>
+          </div>
+          <div class="dash-dual">
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Delay by Cause</div>
+              <div style="position:relative">
+              <!-- circumference = 2π × 78 = 490.09. All segments must sum to 490.09 -->
+              <svg class="donut-chart donut-chart--lg" viewBox="0 0 220 220">
+                <!-- Late Aircraft: 33.73% = 165.3 -->
+                <circle cx="110" cy="110" r="78" fill="none" stroke="var(--vb-sage-dark)" stroke-width="30"
+                  stroke-dasharray="165.3 490.09" stroke-dashoffset="122.5"
+                  class="donut-arc" style="--target:165.3"
+                  data-label="Late Aircraft Delay: 33.73%"/>
+                <!-- Carrier: 32.41% = 158.8, offset = 122.5 - 165.3 = -42.8 -->
+                <circle cx="110" cy="110" r="78" fill="none" stroke="var(--vb-sage)" stroke-width="30"
+                  stroke-dasharray="158.8 490.09" stroke-dashoffset="-42.8"
+                  class="donut-arc" style="--target:158.8"
+                  data-label="Carrier Delay: 32.41%"/>
+                <!-- Weather: 19.80% = 97.0, offset = -42.8 - 158.8 = -201.6 -->
+                <circle cx="110" cy="110" r="78" fill="none" stroke="var(--vb-gold)" stroke-width="30"
+                  stroke-dasharray="97.0 490.09" stroke-dashoffset="-201.6"
+                  class="donut-arc" style="--target:97.0"
+                  data-label="Weather Delay: 19.80%"/>
+                <!-- NAS: 6.58% = 32.2, offset = -201.6 - 97.0 = -298.6 -->
+                <circle cx="110" cy="110" r="78" fill="none" stroke="var(--vb-sage-light)" stroke-width="30"
+                  stroke-dasharray="32.2 490.09" stroke-dashoffset="-298.6"
+                  class="donut-arc" style="--target:32.2"
+                  data-label="National Air System: 6.58%"/>
+                <!-- Security: 0.16% → remainder = 490.09 - 165.3 - 158.8 - 97.0 - 32.2 = 36.79 (visually boosted to close ring) -->
+                <!-- offset = -298.6 - 32.2 = -330.8 -->
+                <circle cx="110" cy="110" r="78" fill="none" stroke="var(--vb-rose)" stroke-width="30"
+                  stroke-dasharray="36.79 490.09" stroke-dashoffset="-330.8"
+                  class="donut-arc" style="--target:36.79"
+                  data-label="Security Delay: 0.16%"/>
+              </svg>
+              </div>
+              <div class="donut-legend" style="margin-top:.75rem">
+                <span><i style="background:var(--vb-sage-dark)"></i> Late Aircraft &mdash; 33.73%</span>
+                <span><i style="background:var(--vb-sage)"></i> Carrier &mdash; 32.41%</span>
+                <span><i style="background:var(--vb-gold)"></i> Weather &mdash; 19.80%</span>
+                <span><i style="background:var(--vb-sage-light)"></i> NAS &mdash; 6.58%</span>
+                <span><i style="background:var(--vb-rose)"></i> Security &mdash; 0.16%</span>
+              </div>
+            </div>
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Avg Delay by Day of Week</div>
+              <div class="vbar-chart" style="height:120px">
+                <div class="vbar-col" data-tooltip="Mon: 6.7 min"><div class="vbar-value">6.7</div><div class="vbar-bar" style="--h:100%;background:var(--vb-sage-dark)"></div><div class="vbar-day">Mon</div></div>
+                <div class="vbar-col" data-tooltip="Sun: 6.1 min"><div class="vbar-value">6.1</div><div class="vbar-bar" style="--h:91%;background:var(--vb-sage-dark)"></div><div class="vbar-day">Sun</div></div>
+                <div class="vbar-col" data-tooltip="Fri: 4.1 min"><div class="vbar-value">4.1</div><div class="vbar-bar" style="--h:61%;background:var(--vb-sage)"></div><div class="vbar-day">Fri</div></div>
+                <div class="vbar-col" data-tooltip="Sat: 2.6 min"><div class="vbar-value">2.6</div><div class="vbar-bar" style="--h:39%;background:var(--vb-gold)"></div><div class="vbar-day">Sat</div></div>
+                <div class="vbar-col" data-tooltip="Tue: 2.6 min"><div class="vbar-value">2.6</div><div class="vbar-bar" style="--h:39%;background:var(--vb-gold)"></div><div class="vbar-day">Tue</div></div>
+                <div class="vbar-col" data-tooltip="Thu: 2.0 min"><div class="vbar-value">2.0</div><div class="vbar-bar" style="--h:30%;background:var(--vb-sage-light)"></div><div class="vbar-day">Thu</div></div>
+                <div class="vbar-col" data-tooltip="Wed: 1.9 min"><div class="vbar-value">1.9</div><div class="vbar-bar" style="--h:28%;background:var(--vb-sage-light)"></div><div class="vbar-day">Wed</div></div>
+              </div>
+              <div class="dash-chart-title" style="margin-top:1.25rem">Avg Delay by Year</div>
+              <div class="sparkline-row">
+                <span class="spark-pt"><strong>2</strong><small>2016</small></span>
+                <span class="spark-pt"><strong>12</strong><small>2018</small></span>
+                <span class="spark-pt neg"><strong>&minus;4</strong><small>2020</small></span>
+                <span class="spark-pt neg"><strong>&minus;5</strong><small>2021</small></span>
+                <span class="spark-pt"><strong>8</strong><small>2022</small></span>
+                <span class="spark-pt"><strong>14</strong><small>2023</small></span>
+                <span class="spark-pt hi"><strong>22</strong><small>2024</small></span>
+                <span class="spark-pt"><strong>7</strong><small>2025</small></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Delay Patterns &amp; Root Causes</h3>
+          <p>This page diagnoses <em>why</em> delays happen and <em>when</em> they concentrate. Late aircraft (33.73%) and carrier delays (32.41%) together account for two-thirds of all disruptions. Time-of-day and day-of-week patterns expose Monday peaks and the COVID-era dip in 2020&ndash;2021, followed by a sharp post-recovery surge peaking at 22 min average in 2024.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 3. AIRPORT PERFORMANCE ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Airport Performance</div>
+          <div class="dash-dual">
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Avg Delay (min) &mdash; Worst Airports</div>
+              <div class="hbar-chart hbar-chart--sm hbar-chart--dense">
+                <div class="hbar-item" data-tooltip="Presque Isle Inter…: Rank 380"><span class="hbar-label">Presque Isle Inter…</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>380</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Mobile Internatio…: Rank 379"><span class="hbar-label">Mobile Internatio…</span><div class="hbar-track"><div class="hbar-fill" style="--w:97%;background:var(--vb-sage-dark)"><span>379</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Nantucket Memor…: Rank 378"><span class="hbar-label">Nantucket Memor…</span><div class="hbar-track"><div class="hbar-fill" style="--w:94%;background:var(--vb-sage)"><span>378</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Pierre Regional: Rank 377"><span class="hbar-label">Pierre Regional</span><div class="hbar-track"><div class="hbar-fill" style="--w:91%;background:var(--vb-sage)"><span>377</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Yakutat Airport: Rank 376"><span class="hbar-label">Yakutat Airport</span><div class="hbar-track"><div class="hbar-fill" style="--w:88%;background:var(--vb-sage)"><span>376</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Francisco C. Ada S…: Rank 375"><span class="hbar-label">Francisco C. Ada S…</span><div class="hbar-track"><div class="hbar-fill" style="--w:85%;background:var(--vb-sage-light)"><span>375</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Waynesville-St. Ro…: Rank 374"><span class="hbar-label">Waynesville-St. Ro…</span><div class="hbar-track"><div class="hbar-fill" style="--w:82%;background:var(--vb-sage-light)"><span>374</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Del Rio Internatio…: Rank 373"><span class="hbar-label">Del Rio Internatio…</span><div class="hbar-track"><div class="hbar-fill" style="--w:79%;background:var(--vb-gold)"><span>373</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Cedar City Regional: Rank 372"><span class="hbar-label">Cedar City Regional</span><div class="hbar-track"><div class="hbar-fill" style="--w:76%;background:var(--vb-gold)"><span>372</span></div></div></div>
+              </div>
+            </div>
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Cancellation Rate % by Airport</div>
+              <div class="hbar-chart hbar-chart--sm hbar-chart--dense">
+                <div class="hbar-item" data-tooltip="Morgantown Mu…: 25.81%"><span class="hbar-label">Morgantown Mu…</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-gold)"><span>25.81%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Watertown Intern…: 24.19%"><span class="hbar-label">Watertown Intern…</span><div class="hbar-track"><div class="hbar-fill" style="--w:93.7%;background:var(--vb-gold)"><span>24.19%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Mammoth Lakes: 19.62%"><span class="hbar-label">Mammoth Lakes</span><div class="hbar-track"><div class="hbar-fill" style="--w:76%;background:var(--vb-gold)"><span>19.62%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Greenbrier Valley: 17.45%"><span class="hbar-label">Greenbrier Valley</span><div class="hbar-track"><div class="hbar-fill" style="--w:67.6%;background:var(--vb-rose)"><span>17.45%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Cold Bay Airport: 16.67%"><span class="hbar-label">Cold Bay Airport</span><div class="hbar-track"><div class="hbar-fill" style="--w:64.6%;background:var(--vb-rose)"><span>16.67%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Ogdensburg Inte…: 15.74%"><span class="hbar-label">Ogdensburg Inte…</span><div class="hbar-track"><div class="hbar-fill" style="--w:61%;background:var(--vb-rose)"><span>15.74%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Houghton Count…: 15.53%"><span class="hbar-label">Houghton Count…</span><div class="hbar-track"><div class="hbar-fill" style="--w:60.2%;background:var(--vb-sage-light)"><span>15.53%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Muskegon County: 15.18%"><span class="hbar-label">Muskegon County</span><div class="hbar-track"><div class="hbar-fill" style="--w:58.8%;background:var(--vb-sage-light)"><span>15.18%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Quincy Regional: 14.86%"><span class="hbar-label">Quincy Regional</span><div class="hbar-track"><div class="hbar-fill" style="--w:57.6%;background:var(--vb-sage-light)"><span>14.86%</span></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="dash-chart-title" style="margin-top:1rem">Bottom 10 Worst Performing Airports</div>
+          <div class="dash-table">
+            <div class="dash-tr dash-tr--head"><span>Airport</span><span>Rank</span></div>
+            <div class="dash-tr"><span>Youngstown-Warren Regional</span><span>380</span></div>
+            <div class="dash-tr"><span>Morgantown Municipal Walter L Bill Hart Field</span><span>379</span></div>
+            <div class="dash-tr"><span>Central Wyoming Regional</span><span>378</span></div>
+            <div class="dash-tr"><span>Dillingham Airport</span><span>377</span></div>
+            <div class="dash-tr"><span>Williston Basin International</span><span>376</span></div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Airport Performance</h3>
+          <p>A ranking-based benchmarking page evaluating every airport by average arrival delay and cancellation rate. <code>RANKX</code>-driven measures surface regional bottlenecks &mdash; Morgantown (25.81% cancellation) and Watertown (24.19%) carry disproportionate risk. <code>USERELATIONSHIP</code> toggles between origin and destination perspectives.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 4. AIRLINE RELIABILITY ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Airline Reliability</div>
+          <div class="dash-kpi-strip">
+            <div class="dash-kpi accent"><span class="dash-kpi-num">39.59</span><span class="dash-kpi-lbl">Avg Delay Severity</span></div>
+          </div>
+          <div class="dash-dual">
+            <div class="dash-dual-col">
+              <div class="dash-chart-title" style="color:var(--vb-sage-dark)">Reliable (&gt;80)</div>
+              <div class="dash-table dash-table--compact">
+                <div class="dash-tr dash-tr--head"><span>Score</span><span>Airline</span></div>
+                <div class="dash-tr"><span>85.45%</span><span>Hawaiian Airlines</span></div>
+                <div class="dash-tr"><span>84.39%</span><span>Delta Air Lines</span></div>
+                <div class="dash-tr"><span>82.14%</span><span>Horizon Air</span></div>
+                <div class="dash-tr"><span>81.77%</span><span>Endeavor Air</span></div>
+                <div class="dash-tr"><span>81.38%</span><span>Southwest Airlines</span></div>
+                <div class="dash-tr"><span>80.42%</span><span>Republic Airline</span></div>
+                <div class="dash-tr"><span>80.10%</span><span>United Air Lines</span></div>
+                <div class="dash-tr"><span>80.03%</span><span>US Airways</span></div>
+                <div class="dash-tr"><span>80.02%</span><span>American Airlines</span></div>
+              </div>
+            </div>
+            <div class="dash-dual-col">
+              <div class="dash-chart-title" style="color:var(--vb-rose)">Needs Improvement (&lt;80)</div>
+              <div class="dash-table dash-table--compact">
+                <div class="dash-tr dash-tr--head"><span>Score</span><span>Airline</span></div>
+                <div class="dash-tr"><span>79.96%</span><span>Alaska Airlines</span></div>
+                <div class="dash-tr"><span>79.15%</span><span>Mesa Airlines</span></div>
+                <div class="dash-tr"><span>77.72%</span><span>Spirit Air Lines</span></div>
+                <div class="dash-tr"><span>77.38%</span><span>SkyWest Airlines</span></div>
+                <div class="dash-tr"><span>76.80%</span><span>ExpressJet Airlines</span></div>
+                <div class="dash-tr"><span>76.54%</span><span>Virgin America</span></div>
+                <div class="dash-tr"><span>75.88%</span><span>PSA Airlines</span></div>
+                <div class="dash-tr"><span>75.37%</span><span>Allegiant Air</span></div>
+                <div class="dash-tr"><span>74.49%</span><span>Envoy Air</span></div>
+                <div class="dash-tr"><span>74.46%</span><span>Frontier Airlines</span></div>
+                <div class="dash-tr"><span>72.45%</span><span>JetBlue Airways</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Airline Reliability</h3>
+          <p>Benchmarks carriers using a composite reliability score balancing on-time performance against cancellation behavior. The 13-point gap between Hawaiian (85.45%) and JetBlue (72.45%) is immediately visible, giving regulators and passengers a data-backed view of which carriers deliver consistent service.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 5. ROUTE PERFORMANCE ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Route Performance</div>
+          <div class="dash-table">
+            <div class="dash-tr dash-tr--head"><span>Route</span><span>Distance</span><span>Avg Delay</span><span>Flights</span><span>Delay Rate</span></div>
+            <div class="dash-tr"><span>CAK &rarr; TYS</span><span>378</span><span>1,237</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>MDT &rarr; HPN</span><span>172</span><span>798</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>FLL &rarr; PIE</span><span>201</span><span>321</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>RAP &rarr; LAX</span><span>1,078</span><span>246</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>RIC &rarr; CAE</span><span>326</span><span>228</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>ATL &rarr; ANC</span><span>3,417</span><span>220</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>PHL &rarr; CHA</span><span>641</span><span>216.67</span><span>6</span><span>83.33%</span></div>
+            <div class="dash-tr"><span>ANC &rarr; ATL</span><span>3,417</span><span>212</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>ORD &rarr; GTF</span><span>1,210</span><span>212</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>CHA &rarr; PHL</span><span>641</span><span>210.50</span><span>6</span><span>66.67%</span></div>
+            <div class="dash-tr"><span>ICT &rarr; DAY</span><span>729</span><span>210</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>CKB &rarr; PIE</span><span>798</span><span>204.83</span><span>6</span><span>33.33%</span></div>
+            <div class="dash-tr"><span>PIE &rarr; CKB</span><span>798</span><span>197.17</span><span>6</span><span>50.00%</span></div>
+            <div class="dash-tr"><span>TTN &rarr; MSP</span><span>989</span><span>193.50</span><span>2</span><span>100%</span></div>
+            <div class="dash-tr"><span>DSM &rarr; PIA</span><span>215</span><span>168</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>DFW &rarr; LIH</span><span>3,847</span><span>154.43</span><span>7</span><span>83.33%</span></div>
+            <div class="dash-tr"><span>BHM &rarr; SFO</span><span>2,013</span><span>148</span><span>2</span><span>100%</span></div>
+            <div class="dash-tr"><span>YNG &rarr; PIE</span><span>927</span><span>141</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>SWF &rarr; BOS</span><span>170</span><span>138</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>MDT &rarr; DEN</span><span>1,474</span><span>128</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>LIH &rarr; DFW</span><span>3,847</span><span>126.86</span><span>7</span><span>83.33%</span></div>
+            <div class="dash-tr"><span>LAX &rarr; LWS</span><span>861</span><span>125</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>BOS &rarr; VPS</span><span>1,187</span><span>116.71</span><span>14</span><span>77.78%</span></div>
+            <div class="dash-tr"><span>DEN &rarr; MDT</span><span>1,474</span><span>114</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>EGE &rarr; LGA</span><span>1,739</span><span>113</span><span>8</span><span>50.00%</span></div>
+            <div class="dash-tr"><span>TTN &rarr; CVG</span><span>532</span><span>112</span><span>2</span><span>100%</span></div>
+            <div class="dash-tr"><span>SWF &rarr; RSW</span><span>1,120</span><span>111</span><span>1</span><span>100%</span></div>
+            <div class="dash-tr"><span>FLL &rarr; SAV</span><span>422</span><span>110.30</span><span>10</span><span>60.00%</span></div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Route Performance</h3>
+          <p>The most granular operational page. It evaluates origin&ndash;destination pairs by average delay, delay rate, and cancellation frequency. Routes like CAK&rarr;TYS (1,237 min, 100% delay rate) and MDT&rarr;HPN (798 min) surface as clear candidates for network redesign. Route identifiers are feature-engineered from origin and destination codes.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 6. ECONOMIC IMPACT ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Economic Impact of Delays</div>
+          <div class="dash-dual">
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Estimated Delay Cost by Time of Day</div>
+              <div class="hbar-chart hbar-chart--sm hbar-chart--dense">
+                <div class="hbar-item" data-tooltip="Midnight: $0.44bn"><span class="hbar-label">12 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:71%;background:var(--vb-sage-dark)"><span>0.44bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="1 AM: $0.28bn"><span class="hbar-label">1 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:45.2%;background:var(--vb-rose)"><span>0.28bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2 AM: $0.14bn"><span class="hbar-label">2 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:22.6%;background:var(--vb-sage-light)"><span>0.14bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="3 AM: $0.04bn"><span class="hbar-label">3 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:6.5%;background:var(--vb-sage-light)"><span>0.04</span></div></div></div>
+                <div class="hbar-item" data-tooltip="4 AM: ~0"><span class="hbar-label">4 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:2%;background:var(--vb-sage-light)"><span></span></div></div></div>
+                <div class="hbar-item" data-tooltip="5 AM: ~0"><span class="hbar-label">5 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:2%;background:var(--vb-sage-light)"><span></span></div></div></div>
+                <div class="hbar-item" data-tooltip="6 AM: ~0"><span class="hbar-label">6 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:2.5%;background:var(--vb-sage-light)"><span></span></div></div></div>
+                <div class="hbar-item" data-tooltip="7 AM: $0.09bn"><span class="hbar-label">7 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:14.5%;background:var(--vb-sage-light)"><span>0.09</span></div></div></div>
+                <div class="hbar-item" data-tooltip="8 AM: $0.17bn"><span class="hbar-label">8 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:27.4%;background:var(--vb-sage)"><span>0.17bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="9 AM: $0.25bn"><span class="hbar-label">9 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:40.3%;background:var(--vb-sage)"><span>0.25bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="10 AM: $0.34bn"><span class="hbar-label">10 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:54.8%;background:var(--vb-sage)"><span>0.34bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="11 AM: $0.39bn"><span class="hbar-label">11 AM</span><div class="hbar-track"><div class="hbar-fill" style="--w:62.9%;background:var(--vb-sage)"><span>0.39bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Noon: $0.43bn"><span class="hbar-label">Noon</span><div class="hbar-track"><div class="hbar-fill" style="--w:69.4%;background:var(--vb-sage)"><span>0.43bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="1 PM: $0.45bn"><span class="hbar-label">1 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:72.6%;background:var(--vb-sage)"><span>0.45bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2 PM: $0.48bn"><span class="hbar-label">2 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:77.4%;background:var(--vb-sage)"><span>0.48bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="3 PM: $0.49bn"><span class="hbar-label">3 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:79%;background:var(--vb-sage)"><span>0.49bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="4 PM: $0.51bn"><span class="hbar-label">4 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:82.3%;background:var(--vb-sage-dark)"><span>0.51bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="5 PM: $0.55bn"><span class="hbar-label">5 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:88.7%;background:var(--vb-sage-dark)"><span>0.55bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="6 PM: $0.57bn"><span class="hbar-label">6 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:91.9%;background:var(--vb-sage-dark)"><span>0.57bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="7 PM: $0.60bn"><span class="hbar-label">7 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:96.8%;background:var(--vb-gold)"><span>0.60bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="8 PM: $0.60bn"><span class="hbar-label">8 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:96.8%;background:var(--vb-gold)"><span>0.60bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="9 PM: $0.62bn"><span class="hbar-label">9 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-gold)"><span>0.62bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="10 PM: $0.60bn"><span class="hbar-label">10 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:96.8%;background:var(--vb-gold)"><span>0.60bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="11 PM: $0.55bn"><span class="hbar-label">11 PM</span><div class="hbar-track"><div class="hbar-fill" style="--w:88.7%;background:var(--vb-sage-dark)"><span>0.55bn</span></div></div></div>
+              </div>
+            </div>
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Estimated Delay Cost by Year</div>
+              <div class="hbar-chart hbar-chart--sm">
+                <div class="hbar-item" data-tooltip="2025: $0.89bn"><span class="hbar-label">2025</span><div class="hbar-track"><div class="hbar-fill" style="--w:73.6%;background:var(--vb-sage-dark)"><span>0.89bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2024: $1.21bn"><span class="hbar-label">2024</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-gold)"><span>1.21bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2023: $0.93bn"><span class="hbar-label">2023</span><div class="hbar-track"><div class="hbar-fill" style="--w:76.9%;background:var(--vb-sage-dark)"><span>0.93bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2022: $0.31bn"><span class="hbar-label">2022</span><div class="hbar-track"><div class="hbar-fill" style="--w:25.6%;background:var(--vb-sage-light)"><span>0.31bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2020: —"><span class="hbar-label">2020</span><div class="hbar-track"><div class="hbar-fill" style="--w:0%;background:var(--vb-sage-light)"><span></span></div></div></div>
+                <div class="hbar-item" data-tooltip="2019: $0.93bn"><span class="hbar-label">2019</span><div class="hbar-track"><div class="hbar-fill" style="--w:76.9%;background:var(--vb-sage)"><span>0.93bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2018: $0.84bn"><span class="hbar-label">2018</span><div class="hbar-track"><div class="hbar-fill" style="--w:69.4%;background:var(--vb-sage)"><span>0.84bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2017: $0.61bn"><span class="hbar-label">2017</span><div class="hbar-track"><div class="hbar-fill" style="--w:50.4%;background:var(--vb-sage)"><span>0.61bn</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2016: $0.55bn"><span class="hbar-label">2016</span><div class="hbar-track"><div class="hbar-fill" style="--w:45.5%;background:var(--vb-sage-light)"><span>0.55bn</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Economic Impact</h3>
+          <p>Translates delay minutes into estimated dollar cost using industry per-minute cost factors. The 7&ndash;10 PM window accounts for the highest concentration ($0.60&ndash;$0.62bn per hour slot). 2024 peaked at $1.21 billion &mdash; converting an abstract operational metric into a tangible business case for schedule optimization.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 7. ENVIRONMENTAL IMPACT ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Environmental Impact</div>
+          <div class="dash-dual">
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">CO₂ Emissions by Airport (M tonnes)</div>
+              <div class="hbar-chart hbar-chart--sm hbar-chart--dense">
+                <div class="hbar-item" data-tooltip="O'Hare: 10.1M"><span class="hbar-label">Chicago O&rsquo;Hare</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>10.1M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Hartsfield-Jackson: 8.6M"><span class="hbar-label">Hartsfield-Jackson</span><div class="hbar-track"><div class="hbar-fill" style="--w:85.1%;background:var(--vb-sage-dark)"><span>8.6M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Dallas/Fort Worth: 7.8M"><span class="hbar-label">Dallas/Fort Worth</span><div class="hbar-track"><div class="hbar-fill" style="--w:77.2%;background:var(--vb-sage)"><span>7.8M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Denver Intl: 7.4M"><span class="hbar-label">Denver Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:73.3%;background:var(--vb-sage)"><span>7.4M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Los Angeles Intl: 5.1M"><span class="hbar-label">Los Angeles Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:50.5%;background:var(--vb-sage)"><span>5.1M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Charlotte Douglas: 4.7M"><span class="hbar-label">Charlotte Douglas</span><div class="hbar-track"><div class="hbar-fill" style="--w:46.5%;background:var(--vb-sage-light)"><span>4.7M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="San Francisco Intl: 4.6M"><span class="hbar-label">San Francisco Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:45.5%;background:var(--vb-sage-light)"><span>4.6M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Detroit Metro: 4.4M"><span class="hbar-label">Detroit Metro</span><div class="hbar-track"><div class="hbar-fill" style="--w:43.6%;background:var(--vb-sage-light)"><span>4.4M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="LaGuardia: 4.4M"><span class="hbar-label">LaGuardia</span><div class="hbar-track"><div class="hbar-fill" style="--w:43.6%;background:var(--vb-sage-light)"><span>4.4M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Orlando Intl: 4.3M"><span class="hbar-label">Orlando Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:42.6%;background:var(--vb-sage-light)"><span>4.3M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Harry Reid Intl: 4.1M"><span class="hbar-label">Harry Reid Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:40.6%;background:var(--vb-sage-light)"><span>4.1M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Logan Intl: 3.9M"><span class="hbar-label">Logan Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:38.6%;background:var(--vb-gold)"><span>3.9M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Newark Liberty: 3.8M"><span class="hbar-label">Newark Liberty</span><div class="hbar-track"><div class="hbar-fill" style="--w:37.6%;background:var(--vb-gold)"><span>3.8M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="George Bush Intl: 3.8M"><span class="hbar-label">George Bush Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:37.6%;background:var(--vb-gold)"><span>3.8M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="JFK Intl: 3.7M"><span class="hbar-label">JFK Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:36.6%;background:var(--vb-gold)"><span>3.7M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Phoenix Sky Harbor: 3.7M"><span class="hbar-label">Phoenix Sky Harbor</span><div class="hbar-track"><div class="hbar-fill" style="--w:36.6%;background:var(--vb-gold)"><span>3.7M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Minneapolis-St Paul: 3.6M"><span class="hbar-label">Minneapolis-St Paul</span><div class="hbar-track"><div class="hbar-fill" style="--w:35.6%;background:var(--vb-gold)"><span>3.6M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Ronald Reagan: 3.6M"><span class="hbar-label">Ronald Reagan</span><div class="hbar-track"><div class="hbar-fill" style="--w:35.6%;background:var(--vb-gold)"><span>3.6M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Seattle/Tacoma: 3.2M"><span class="hbar-label">Seattle/Tacoma</span><div class="hbar-track"><div class="hbar-fill" style="--w:31.7%;background:var(--vb-rose)"><span>3.2M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Miami Intl: 3.1M"><span class="hbar-label">Miami Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:30.7%;background:var(--vb-rose)"><span>3.1M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Fort Lauderdale: 3.1M"><span class="hbar-label">Fort Lauderdale</span><div class="hbar-track"><div class="hbar-fill" style="--w:30.7%;background:var(--vb-rose)"><span>3.1M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Salt Lake City: 2.9M"><span class="hbar-label">Salt Lake City</span><div class="hbar-track"><div class="hbar-fill" style="--w:28.7%;background:var(--vb-rose)"><span>2.9M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Philadelphia Intl: 2.5M"><span class="hbar-label">Philadelphia Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:24.8%;background:var(--vb-rose)"><span>2.5M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Baltimore/Washington: 2.2M"><span class="hbar-label">Baltimore/Wash</span><div class="hbar-track"><div class="hbar-fill" style="--w:21.8%;background:var(--vb-rose)"><span>2.2M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Nashville Intl: 2.0M"><span class="hbar-label">Nashville Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:19.8%;background:var(--vb-rose)"><span>2.0M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="Tampa Intl: 1.9M"><span class="hbar-label">Tampa Intl</span><div class="hbar-track"><div class="hbar-fill" style="--w:18.8%;background:var(--vb-rose)"><span>1.9M</span></div></div></div>
+              </div>
+            </div>
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">CO₂ Emissions by Year (M tonnes)</div>
+              <div class="hbar-chart hbar-chart--sm">
+                <div class="hbar-item" data-tooltip="2024: 26M"><span class="hbar-label">2024</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-sage-dark)"><span>26M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2023: 22M"><span class="hbar-label">2023</span><div class="hbar-track"><div class="hbar-fill" style="--w:84.6%;background:var(--vb-sage-dark)"><span>22M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2019: 20M"><span class="hbar-label">2019</span><div class="hbar-track"><div class="hbar-fill" style="--w:76.9%;background:var(--vb-sage)"><span>20M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2025: 19M"><span class="hbar-label">2025</span><div class="hbar-track"><div class="hbar-fill" style="--w:73.1%;background:var(--vb-sage)"><span>19M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2022: 18M"><span class="hbar-label">2022</span><div class="hbar-track"><div class="hbar-fill" style="--w:69.2%;background:var(--vb-sage)"><span>18M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2018: 18M"><span class="hbar-label">2018</span><div class="hbar-track"><div class="hbar-fill" style="--w:69.2%;background:var(--vb-sage-light)"><span>18M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2020: 15M"><span class="hbar-label">2020</span><div class="hbar-track"><div class="hbar-fill" style="--w:57.7%;background:var(--vb-sage-light)"><span>15M</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2021: 6M"><span class="hbar-label">2021</span><div class="hbar-track"><div class="hbar-fill" style="--w:23.1%;background:var(--vb-rose)"><span>6M</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Environmental Impact</h3>
+          <p>Estimates excess fuel burn and CO₂ emissions directly attributable to delay minutes. Chicago O&rsquo;Hare leads at 10.1M tonnes, followed by Atlanta (8.6M), DFW (7.8M), and Denver (7.4M). 2024 peaked at 26M tonnes &mdash; framing delays as a measurable environmental liability with regulatory exposure for ESG stakeholders.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 8. FLIGHT CANCELLATION ANALYSIS ═══ -->
+      <div class="dash-card reveal">
+        <div class="dash-chart-area">
+          <div class="dash-header">Flight Cancellation Analysis</div>
+          <div class="dash-dual">
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Cancellation Cause Breakdown</div>
+              <div style="position:relative">
+              <!-- circumference = 2π × 68 = 427.3 -->
+              <svg class="donut-chart" viewBox="0 0 180 180" style="width:170px;height:170px;display:block;margin:0 auto">
+                <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-linen)" stroke-width="24"/>
+                <!-- Weather: 66.28% = 283.2 -->
+                <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-sage-dark)" stroke-width="24"
+                  stroke-dasharray="283.2 427.3" stroke-dashoffset="106.8"
+                  class="donut-arc" style="--target:283.2"
+                  data-label="Weather Cancellation: 66.28%"/>
+                <!-- Carrier: 23.95% = 102.3, offset = 106.8 - 283.2 = -176.4 -->
+                <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-gold)" stroke-width="24"
+                  stroke-dasharray="102.3 427.3" stroke-dashoffset="-176.4"
+                  class="donut-arc" style="--target:102.3"
+                  data-label="Carrier Cancellation: 23.95%"/>
+                <!-- NAS: 8.72% = 37.3, offset = -176.4 - 102.3 = -278.7 -->
+                <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-sage)" stroke-width="24"
+                  stroke-dasharray="37.3 427.3" stroke-dashoffset="-278.7"
+                  class="donut-arc" style="--target:37.3"
+                  data-label="NAS Cancellation: 8.72%"/>
+                <!-- Security: 1.06% = 4.5 (min visible), offset = -278.7 - 37.3 = -316.0 -->
+                <circle cx="90" cy="90" r="68" fill="none" stroke="var(--vb-rose)" stroke-width="24"
+                  stroke-dasharray="4.5 427.3" stroke-dashoffset="-316.0"
+                  class="donut-arc" style="--target:4.5"
+                  data-label="Security Cancellation: 1.06%"/>
+                <text x="90" y="82" text-anchor="middle" class="donut-center-val" font-size="20">157.25K</text>
+                <text x="90" y="100" text-anchor="middle" class="donut-center-lbl" font-size="9">Cancelled</text>
+              </svg>
+              </div>
+              <div class="donut-legend" style="margin-top:.75rem">
+                <span><i style="background:var(--vb-sage-dark)"></i> Weather &mdash; 66.28%</span>
+                <span><i style="background:var(--vb-gold)"></i> Carrier &mdash; 23.95%</span>
+                <span><i style="background:var(--vb-sage)"></i> NAS &mdash; 8.72%</span>
+                <span><i style="background:var(--vb-rose)"></i> Security &mdash; 1.06%</span>
+              </div>
+            </div>
+            <div class="dash-dual-col">
+              <div class="dash-chart-title">Cancellation Rate by Year</div>
+              <div class="hbar-chart hbar-chart--sm hbar-chart--dense">
+                <div class="hbar-item" data-tooltip="2025: 3.02%"><span class="hbar-label">2025</span><div class="hbar-track"><div class="hbar-fill" style="--w:48.9%;background:var(--vb-gold)"><span>3.02%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2024: 3.73%"><span class="hbar-label">2024</span><div class="hbar-track"><div class="hbar-fill" style="--w:60.4%;background:var(--vb-gold)"><span>3.73%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2024 (alt): 1.91%"><span class="hbar-label"></span><div class="hbar-track"><div class="hbar-fill" style="--w:30.9%;background:var(--vb-sage)"><span>1.91%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2023: 1.91%"><span class="hbar-label">2023</span><div class="hbar-track"><div class="hbar-fill" style="--w:30.9%;background:var(--vb-sage)"><span>1.91%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2022: 6.18%"><span class="hbar-label">2022</span><div class="hbar-track"><div class="hbar-fill" style="--w:100%;background:var(--vb-gold)"><span>6.18%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2022 (alt): 1.01%"><span class="hbar-label"></span><div class="hbar-track"><div class="hbar-fill" style="--w:16.3%;background:var(--vb-sage-light)"><span>1.01%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2020: 1.14%"><span class="hbar-label">2020</span><div class="hbar-track"><div class="hbar-fill" style="--w:18.4%;background:var(--vb-sage-light)"><span>1.14%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2019: 2.86%"><span class="hbar-label">2019</span><div class="hbar-track"><div class="hbar-fill" style="--w:46.3%;background:var(--vb-sage)"><span>2.86%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2018: 3.01%"><span class="hbar-label">2018</span><div class="hbar-track"><div class="hbar-fill" style="--w:48.7%;background:var(--vb-sage)"><span>3.01%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2018 (alt): 1.97%"><span class="hbar-label"></span><div class="hbar-track"><div class="hbar-fill" style="--w:31.9%;background:var(--vb-sage-light)"><span>1.97%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2016: 2.62%"><span class="hbar-label">2016</span><div class="hbar-track"><div class="hbar-fill" style="--w:42.4%;background:var(--vb-sage)"><span>2.62%</span></div></div></div>
+                <div class="hbar-item" data-tooltip="2016 (alt): 2.66%"><span class="hbar-label"></span><div class="hbar-track"><div class="hbar-fill" style="--w:43%;background:var(--vb-sage)"><span>2.66%</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <h3>Flight Cancellation Analysis</h3>
+          <p>A dedicated deep-dive into 157K cancelled flights. Weather dominates at 66.28%, followed by carrier issues (23.95%), NAS (8.72%), and security (1.06%). 2022 saw the highest cancellation rate (6.18%), likely driven by post-COVID operational strain. The breakdown helps distinguish uncontrollable weather cancellations from carrier-driven failures where process improvements can reduce failure rates.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ PROCESS ════════════ -->
+<section>
+  <div class="container reveal">
+    <div class="section-num">04 &mdash; Methodology</div>
+    <h2>Analytical Process</h2>
+    <p class="section-lead">A structured five-stage pipeline from raw data to executive-ready dashboards.</p>
+
+    <div class="process-timeline">
+      <div class="process-step">
+        <h3>Data Understanding &amp; Cleaning</h3>
+        <p>Reviewed raw flight-level data. Handled nulls, cancellations, and delay edge cases.</p>
+      </div>
+      <div class="process-step">
+        <h3>Data Modeling</h3>
+        <p>Designed a star schema with dimension tables for airports, airlines, time, calendar, and routes. Managed active and inactive relationships for origin/destination logic.</p>
+      </div>
+      <div class="process-step">
+        <h3>Feature Engineering</h3>
+        <p>Calculated delay metrics, cancellation rates, and reliability scores. Built route identifiers and performance flags.</p>
+      </div>
+      <div class="process-step">
+        <h3>DAX Development</h3>
+        <p>Advanced measures using <code>CALCULATE</code>, <code>RANKX</code>, <code>FILTER</code>, and <code>USERELATIONSHIP</code>. Performance-aware aggregations.</p>
+      </div>
+      <div class="process-step">
+        <h3>Visualization &amp; Storytelling</h3>
+        <p>Business-aligned dashboard design with clear KPI framing and benchmarking logic.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ AUDIENCE ════════════ -->
+<section>
+  <div class="container reveal">
+    <div class="section-num">05 &mdash; Audience</div>
+    <h2>Purpose &amp; Target Audience</h2>
+    <p>This project supports operational decision-making, identifies structural inefficiencies, and enables performance benchmarking for airline operations and network planning teams, airport authorities, aviation regulators, business and data analysts, and sustainability and ESG stakeholders.</p>
+    <div class="tag-row">
+      <span class="tag">Business Intelligence</span>
+      <span class="tag">Power BI</span>
+      <span class="tag">Data Modeling</span>
+      <span class="tag">Star Schema</span>
+      <span class="tag">DAX</span>
+      <span class="tag">Operations Analytics</span>
+      <span class="tag">Aviation Analytics</span>
+      <span class="tag">ETL</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ WHAT I LEARNED ════════════ -->
+<section>
+  <div class="container reveal">
+    <div class="section-num">06 &mdash; Reflections</div>
+    <h2>What I Learned</h2>
+    <p>Designing scalable data models for large datasets. Translating operational metrics into business KPIs. Using DAX for ranking, benchmarking, and conditional logic. Balancing analytical depth with executive-level clarity. Applying analytics beyond finance into operations and sustainability.</p>
+    <h3>Next Phase</h3>
+    <p>Predictive analysis implementation.</p>
+  </div>
+</section>
+
+<!-- ════════════ HOW TO USE ════════════ -->
+<section>
+  <div class="container reveal">
+    <div class="section-num">07 &mdash; Resources</div>
+    <h2>How to Use This Repository</h2>
+    <p>Open the <code>.pbix</code> file to explore interactive dashboards, or review the exported PDF for a static executive summary.</p>
+    <div class="btn-row">
+      <a href="https://drive.google.com/file/d/1bXrlKnyMT-KtkH0JB6_kqHgJHNrdK3z3/view?usp=drive_link" class="btn btn-primary" target="_blank" rel="noopener">&#11015; Download PBIX</a>
+      <a href="https://github.com/Anne-Wambaire-Mwangi/USA-flight-operations-analysis/blob/main/US_Flights_Analysis.pdf" class="btn btn-outline" target="_blank" rel="noopener">&#128196; Download PDF</a>
+      <a href="https://github.com/Anne-Wambaire-Mwangi/USA-flight-operations-analysis/blob/main/video/How%20To%20Navigate.mp4" class="btn btn-outline" target="_blank" rel="noopener">&#9654; Video Tutorial</a>
+    </div>
+
+    <div class="note-box" style="margin-top:2.5rem">
+      <h3>Data Notes</h3>
+      <p><strong>Operational view:</strong> Includes all positive delay minutes (ArrDelay &gt; 0) for root cause and customer experience analysis.</p>
+      <p><strong>Regulatory view:</strong> Includes only flights with ArrDelay &ge; 15 for BTS/DOT compliance and industry benchmarking (Source: Bureau of Transportation Statistics, Airline Service Quality Performance 234).</p>
+      <p><strong>Data Source:</strong> <a href="https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FGJ&QO_fu146_anzr=b0-gvzr" target="_blank" rel="noopener">Bureau of Transportation Statistics &mdash; On-Time Performance</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer>
+  <p><strong>Anne Wambaire Mwangi</strong></p>
+  <p class="footer-tags">Business Intelligence &middot; Operations Analytics &middot; Aviation Systems</p>
+  <p style="margin-top:.75rem"><a href="https://github.com/Anne-Wambaire-Mwangi/USA-flight-operations-analysis">View on GitHub</a></p>
+</footer>
+
+<!-- ── Scroll reveal + Donut interactivity ── -->
+<script>
+  document.addEventListener('DOMContentLoaded',()=>{
+    // Scroll reveal
+    const els=document.querySelectorAll('.reveal');
+    const io=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}})
+    },{threshold:0.12});
+    els.forEach(el=>io.observe(el));
+
+    // Donut tooltip
+    const tip=document.createElement('div');
+    tip.className='donut-tooltip';
+    document.body.appendChild(tip);
+
+    document.querySelectorAll('.donut-arc[data-label]').forEach(arc=>{
+      arc.addEventListener('mouseenter',e=>{
+        tip.textContent=arc.getAttribute('data-label');
+        tip.classList.add('show');
+      });
+      arc.addEventListener('mousemove',e=>{
+        tip.style.left=e.pageX+12+'px';
+        tip.style.top=e.pageY-32+'px';
+      });
+      arc.addEventListener('mouseleave',()=>{
+        tip.classList.remove('show');
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
